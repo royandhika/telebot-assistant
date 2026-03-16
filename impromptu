@@ -1,0 +1,56 @@
+$prompt = <<<PROMPT
+            Analisis input berikut dan tentukan apakah ini transaksi expense atau income, lalu konversi menjadi data keuangan dalam format JSON yang TEPAT.
+
+            Format output yang HARUS diikuti (return SATU object JSON, BUKAN array):
+            {
+                "wallet_id": "tentukan wallet_id jika ada, atau null jika tidak ada",
+                "judul": "deskripsi singkat (maks 200 karakter)",
+                "jenis": "income" atau "expense",
+                "kategori": "pilih salah satu kategori yang sesuai",
+                "tanggal": "Format tanggal YYYY-MM-DD",
+                "items": [
+                    {
+                        "nama": "nama item",
+                        "nominal": nominal dalam rupiah (angka saja, tanpa Rp atau titik), nominal satuan, maks 2 decimal places
+                        "qty": jumlah item (angka saja) JIKA ADA, atau 1 jika tidak ada informasi jumlah
+                    }
+                ],
+                "total": total keseluruhan dalam rupiah (angka saja), maks 2 decimal places
+            }
+
+            Kategori yang tersedia:
+            - Untuk income: {$incomeCategories}
+            - Untuk expense: {$expenseCategories}
+
+            Informasi Waktu:
+            - Tanggal hari ini: {$today}
+            - Bulan dan tahun saat ini: {$currentMonth}
+            - Tahun saat ini: {$currentYear}
+
+            Aturan TANGGAL yang SANGAT PENTING:
+            - Jika user menyebutkan tanggal SPESIFIK (contoh: "tgl 14", "tanggal 1", "tgl 25"), gunakan tanggal tersebut di bulan dan tahun yang sama dengan hari ini
+            - Format: jika user bilang "tgl 14" dan sekarang bulan November 2025, maka tanggalnya adalah "2025-11-14"
+            - Jika user bilang "tgl 1" artinya tanggal 1 di bulan ini, BUKAN kemarin
+            - Jika user bilang "kemarin" atau "yesterday", kurangi 1 hari dari tanggal hari ini
+            - Jika user bilang "besok" atau "tomorrow", tambah 1 hari dari tanggal hari ini
+            - Jika user bilang "hari ini" atau "today" atau tidak menyebutkan tanggal, gunakan tanggal hari ini
+            - Jika user menyebutkan nama hari (Senin, Selasa, dll), hitung tanggal berdasarkan hari tersebut
+            - PERHATIKAN: "tgl 14" ≠ hari ini, tetapi tanggal 14 di bulan yang sedang berjalan
+
+            Aturan PENTING lainnya:
+            - Tentukan sendiri apakah transaksi ini "income" atau "expense" berdasarkan konteks
+            - Gunakan pemahaman natural: struk belanja = expense, transfer masuk = income, gaji = income, bayar tagihan = expense, dll
+            - Pilih kategori yang PALING SESUAI dari daftar di atas berdasarkan jenis transaksi
+            - JIKA NOMINAL TIDAK TERTERA pada input teks, JANGAN mencoba untuk menebak - tandai bahwa data tidak lengkap
+            - Nominal dan total harus angka murni (contoh: 50000, bukan "50.000" atau "Rp 50.000")
+            - Pahami singkatan: "jt" = juta (000000), "rb" = ribu (000), "k" = ribu (000)
+            - Contoh: "20jt" = 20000000, "500rb" = 500000, "50k" = 50000
+            - SERTAKAN SEMUA ITEM termasuk PPN, Pajak, Service Charge, Biaya Admin, atau biaya tambahan lainnya sebagai item terpisah
+            - Jika ada PPN/pajak/service charge, masukkan sebagai item dengan nama yang jelas (contoh: "PPN 11%", "Service Charge", "Biaya Admin")
+            - Total harus sama dengan jumlah semua nominal item (termasuk pajak/biaya)
+            - Return HANYA JSON, tanpa markdown atau text tambahan
+            - Judul harus SINGKAT dan JELAS, maksimal 200 karakter (contoh: "Belanja Supermart", "Gaji Bulanan Nov", "Top Up OVO")
+            - Wallet dan idnya: {$walletsJson}
+
+            Input teks: {$text}
+        PROMPT;
