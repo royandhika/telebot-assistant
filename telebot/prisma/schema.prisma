@@ -11,37 +11,37 @@ model User {
     username  String?
     createdAt DateTime @default(now()) @map("created_at")
 
-    projects Project[]
-    tasks    Task[]
+    tasks Task[]
+    chats Chat[]
 
     @@map("users")
 }
 
 model Project {
     id        Int      @id @default(autoincrement())
-    name      String
-    userId    BigInt   @map("user_id")
+    name      String   @unique
     createdAt DateTime @default(now()) @map("created_at")
 
-    user  User   @relation(fields: [userId], references: [id])
     tasks Task[]
 
     @@map("projects")
 }
 
 model Task {
-    id        Int       @id @default(autoincrement())
-    title     String
-    notes     String?   @db.Text
-    priority  String    @default("medium") // low, medium, high
-    status    String    @default("todo") // todo, doing, done
-    dueDate   DateTime? @map("due_date")
-    userId    BigInt    @map("user_id")
-    projectId Int?      @map("project_id")
-    createdAt DateTime  @default(now()) @map("created_at")
+    id          Int       @id @default(autoincrement())
+    taskType    String    @map("task_type") // task, bug, feature
+    title       String
+    notes       String?   @db.Text
+    priority    String    @default("medium") // low, medium, high
+    status      String    @default("todo") // todo, doing, done
+    dueDate     DateTime? @map("due_date")
+    completedAt DateTime? @map("completed_at")
+    userId      BigInt    @map("user_id")
+    projectId   Int?      @map("project_id")
+    createdAt   DateTime  @default(now()) @map("created_at")
 
-    user      User       @relation(fields: [userId], references: [id])
-    project   Project?   @relation(fields: [projectId], references: [id])
+    users     User       @relation(fields: [userId], references: [id])
+    projects  Project?   @relation(fields: [projectId], references: [id])
     reminders Reminder[]
 
     @@map("tasks")
@@ -54,7 +54,20 @@ model Reminder {
     taskId    Int      @map("task_id")
     createdAt DateTime @default(now()) @map("created_at")
 
-    task Task @relation(fields: [taskId], references: [id])
+    tasks Task @relation(fields: [taskId], references: [id])
 
     @@map("reminders")
+}
+
+model Chat {
+    id        BigInt
+    userId    BigInt   @map("user_id")
+    body      String?
+    lang      String
+    createdAt DateTime @map("created_at")
+
+    users User @relation(fields: [userId], references: [id])
+
+    @@id([id, userId])
+    @@map("chats")
 }
