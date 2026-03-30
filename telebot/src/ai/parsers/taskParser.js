@@ -1,9 +1,4 @@
-import { GoogleGenAI, ThinkingLevel } from '@google/genai';
-
-const ai = new GoogleGenAI({
-    apiKey: process.env.GOOGLE_API_KEY
-});
-
+import { ai, openai } from '../index.js';
 
 async function parseTask(userMessage) {
 	const today = new Date().toISOString();
@@ -45,7 +40,7 @@ async function parseTask(userMessage) {
 		3. title: Mandatory. Keep it short. Keep the capital letter. Additional details should go into the 'notes' field.
 		4. notes: Optional. No repeating the 'title'. If no extra details provided, set as null.
 		5. priority: Categorize strictly as 'low', 'medium', or 'high'. Default to 'medium' if unclear.
-		6. dueDate: ISO 8601 string in UTC.
+		6. dueDate: ISO 8601 string in UTC. If no date mentioned, set default to tomorrow's date at 01:00 UTC.
 
 		## OUTPUT FORMAT
 		Return ONLY a valid JSON object. No markdown blocks, no conversational filler.
@@ -55,20 +50,29 @@ async function parseTask(userMessage) {
 			'title': string,
 			'notes': string | null,
 			'priority': 'low' | 'medium' | 'high',
-			'dueDate': string | null
+			'dueDate': string
 		}
 	`;
 
-  const aiResponse = await ai.models.generateContent({ 
-    model: 'gemini-3.1-flash-lite-preview',
-		contents: userMessage,
-    config: {
-      responseMimeType: 'application/json',
-      systemInstruction: systemPrompt,
-    }
-  });
+//   const aiResponse = await ai.models.generateContent({ 
+//     model: 'gemini-3.1-flash-lite-preview',
+// 		contents: userMessage,
+//     config: {
+//       responseMimeType: 'application/json',
+//       systemInstruction: systemPrompt,
+//     }
+//   });
+  const aiResponse = await openai.responses.create({
+    model: 'gpt-5-nano',
+    input: userMessage,
+    reasoning: {
+      effort: 'minimal',
+    },
+    instructions: systemPrompt,
+  })
+  console.log(aiResponse);
 
-	return JSON.parse(aiResponse.text);
+  return JSON.parse(aiResponse.output_text);
 }
 
 export { parseTask };
