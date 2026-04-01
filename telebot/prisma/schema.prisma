@@ -7,9 +7,10 @@ datasource db {
 }
 
 model User {
-    id        BigInt   @id @unique
-    username  String?
-    createdAt DateTime @default(now()) @map("created_at")
+    id         BigInt   @id @unique
+    username   String?
+    createdAt  DateTime @default(now()) @map("created_at")
+    modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
 
     tasks Task[]
     chats Chat[]
@@ -18,9 +19,10 @@ model User {
 }
 
 model Project {
-    id        Int      @id @default(autoincrement())
-    name      String   @unique
-    createdAt DateTime @default(now()) @map("created_at")
+    id         Int      @id @default(autoincrement())
+    name       String   @unique
+    createdAt  DateTime @default(now()) @map("created_at")
+    modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
 
     tasks Task[]
 
@@ -39,24 +41,12 @@ model Task {
     userId      BigInt    @map("user_id")
     projectId   Int?      @map("project_id")
     createdAt   DateTime  @default(now()) @map("created_at")
+    modifiedAt  DateTime  @default(now()) @updatedAt @map("modified_at")
 
-    users     User       @relation(fields: [userId], references: [id])
-    projects  Project?   @relation(fields: [projectId], references: [id])
-    reminders Reminder[]
+    users    User     @relation(fields: [userId], references: [id])
+    projects Project? @relation(fields: [projectId], references: [id])
 
     @@map("tasks")
-}
-
-model Reminder {
-    id        Int      @id @default(autoincrement())
-    remindAt  DateTime @map("remind_at")
-    isSent    Boolean  @default(false) @map("is_sent")
-    taskId    Int      @map("task_id")
-    createdAt DateTime @default(now()) @map("created_at")
-
-    tasks Task @relation(fields: [taskId], references: [id])
-
-    @@map("reminders")
 }
 
 model Chat {
@@ -70,4 +60,18 @@ model Chat {
 
     @@id([id, userId])
     @@map("chats")
+}
+
+model Database {
+    id         Int      @id @default(autoincrement())
+    name       String
+    dialect    String
+    host       String
+    port       Int
+    username   String
+    password   String
+    createdAt  DateTime @default(now()) @map("created_at")
+    modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
+
+    @@map("databases")
 }
