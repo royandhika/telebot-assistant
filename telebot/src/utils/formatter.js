@@ -8,12 +8,24 @@ function formatTaskDueDate(dueDate) {
     }).format(new Date(dueDate));
 }
 
-function buildTaskReplyMessage(replyParam) {
+function buildTaskReplyMessage(newTask) {
     return `
-        <b>🛠️ PROJECT:</b> ${replyParam.projectName}
-        <b>📝 TASK:</b> ${replyParam.title}
-        <b>📆 DEADLINE:</b> ${replyParam.dueDate}
-    `.replace(/^\s+/gm, '');
+<b>🛠️ Project:</b> ${newTask.projectName}
+<b>📝 Task:</b> ${newTask.title}
+<b>📆 Deadline:</b> ${newTask.dueDate}
+`
 }
 
-export { formatTaskDueDate, buildTaskReplyMessage };
+function buildDatabaseReplyMessage(newDb) {
+    return `
+<b>💾 Database udah ditambahkan</b>
+
+<b>Host:</b> ${newDb.host}:${newDb.port}
+<b>Database:</b> ${newDb.name}
+<b>Username:</b> ${newDb.username}
+
+Kamu bisa pakai database ini untuk pipeline barumu.
+`
+}
+
+export { formatTaskDueDate, buildTaskReplyMessage, buildDatabaseReplyMessage };

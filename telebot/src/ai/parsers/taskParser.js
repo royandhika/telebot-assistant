@@ -1,6 +1,6 @@
 import { ai, openai } from '../index.js';
 
-async function parseTask(userMessage) {
+export async function parseTask(userMessage) {
 	const today = new Date().toISOString();
 	const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 	const systemPrompt = `
@@ -54,25 +54,12 @@ async function parseTask(userMessage) {
 		}
 	`;
 
-//   const aiResponse = await ai.models.generateContent({ 
-//     model: 'gemini-3.1-flash-lite-preview',
-// 		contents: userMessage,
-//     config: {
-//       responseMimeType: 'application/json',
-//       systemInstruction: systemPrompt,
-//     }
-//   });
   const aiResponse = await openai.responses.create({
     model: 'gpt-5-nano',
     input: userMessage,
-    reasoning: {
-      effort: 'minimal',
-    },
+    reasoning: { effort: 'minimal' },
     instructions: systemPrompt,
   })
-  console.log(aiResponse);
 
   return JSON.parse(aiResponse.output_text);
 }
-
-export { parseTask };
