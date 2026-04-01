@@ -13,3 +13,26 @@ services:
       - "${MYSQL_PORT}:3306"
     volumes:
       - ./mysql:/var/lib/mysql
+    networks:
+      - telebot-network 
+  dwh:
+    image: clickhouse:26.1.2.11
+    container_name: telebot-dwh
+    restart: always 
+    ports:
+      - "${CLICKHOUSE_PORT}:8123"
+    environment:
+      # TZ: ${TZ}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER}
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ulimits:
+      nofile: { soft: 262144, hard: 262144 }
+    networks:
+      - telebot-network
+
+networks:
+  telebot-network:
+    name: telebot-network
+    driver: bridge
