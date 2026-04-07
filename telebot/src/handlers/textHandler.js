@@ -6,15 +6,19 @@ import { handleUpdate } from './tasks/updateTaskHandler.js';
 import { handleAddDatabase } from './databases/addDatabaseHandler.js';
 import logger from '../logger/logger.js';
 
-export async function handleTextMessage(ctx) {
-  const message = {
+export function createMessageObject(ctx) {
+  return {
     userId: BigInt(ctx.message.from.id),
     username: ctx.message.from.username,
     messageId: ctx.message.message_id,
     messageText: ctx.message.text,
     langCode: ctx.message.from.language_code,
     createdAt: new Date(ctx.message.date * 1000),
-  }
+  };
+}
+
+export async function handleTextMessage(ctx) {
+  const message = createMessageObject(ctx);
 
   try {
     ctx.sendChatAction('typing');
