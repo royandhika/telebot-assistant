@@ -1,106 +1,103 @@
-# 🤖 Butler AI: Autonomous Personal Assistant & Task Pipeline
+# 🤖 Butler AI: Personal Assistant & ETL Data Pipeline
 
 [![Tech Stack](https://img.shields.io/badge/Stack-Node.js%20%7C%20Prisma%20%7C%20MySQL%20%7C%20Docker-blue)](#)
 
-**Butler AI** bukan sekadar bot Telegram biasa. Ini adalah ekosistem asisten pribadi berbasis LLM (Large Language Model) yang dirancang untuk menangani *unstructured data* (chat) menjadi *structured tasks* yang dapat dikelola secara sistematis.
+**Butler AI** adalah asisten pribadi pintar berbasis LLM yang dirancang khusus untuk mengubah percakapan santai di Telegram menjadi data yang terstruktur. Fokus utamanya adalah membantu kamu mengelola tugas (*Task Management*) dan mempermudah proses pendaftaran sumber data seperti database atau file.
 
-Sebagai proyek portofolio **Data Engineering**, fokus utama sistem ini adalah pada **data integrity, schema design, dan efisiensi alur pemrosesan pesan.**
+Sebagai proyek portofolio **Data Engineering**, sistem ini menekankan pada **integritas data, desain skema yang scalable, dan efisiensi alur pemrosesan pesan otomatis.**
 
 ---
 
-## 🏗️ System Architecture & Data Flow
+## 🏗️ Arsitektur Sistem & Alur Data
 
-Sistem ini membagi pemrosesan menjadi dua jalur utama sesuai dengan blueprint desain:
+Butler AI bekerja dengan membagi pemrosesan menjadi dua jalur utama:
 
-### 1. Ingestion Pipeline (Input Task)
-Mengubah input natural language dari Telegram menjadi entri database yang terstruktur.
+### 1. Ingestion Pipeline (Input & Parsing)
+Mengubah bahasa natural dari chat menjadi entri database yang rapi. Misalnya, kamu cukup chat "Tolong buatkan task meeting besok jam 10 pagi", dan AI akan mengekstrak detailnya secara otomatis.
 ![Input diagram](assets/input_task.png)
 
-### 2. Retrieval & Action Pipeline (Request Task)
-Mengambil data (querying) berdasarkan konteks user dan melakukan aksi yang diminta.
+### 2. Action Pipeline (Retrieval & Management)
+Mengelola data yang sudah ada, mulai dari melihat daftar tugas hingga mengupdate status pekerjaan langsung melalui bot.
 ![Request diagram](assets/request_task.png)
 
 ---
 
-## 🛠️ Data Engineering Stack
+## 🚀 Fitur Utama
 
-- **Runtime:** [Node.js](https://nodejs.org/) - Event-driven architecture untuk handling webhook Telegram.
-- **ORM:** [Prisma](https://www.prisma.io/) - Memastikan *type-safety* dan migrasi skema database yang terkontrol.
-- **Database:** [MySQL](https://www.mysql.com/) - Relational storage untuk manajemen state user, task, dan log aktivitas.
-- **Infrastructure:** [Docker & Docker Compose](https://www.docker.com/) - Containerization untuk kemudahan deployment dan isolasi environment database.
-- **AI Integration:** OpenAI/Gemini API - Digunakan sebagai *logic engine* untuk ekstraksi entitas.
+- **Natural Language Task Management:** Tidak perlu isi form kaku. Cukup bicara seperti biasa, dan bot akan mencatat judul, kategori, prioritas, hingga deadline tugasmu.
+- **Command Shortcuts:** Akses cepat menggunakan perintah:
+  - `/create_task` - Membuat tugas baru.
+  - `/view_task` - Melihat daftar tugas aktif.
+  - `/edit_task` - Mengubah detail atau status tugas.
+- **Database Registration:** Daftarkan koneksi database (MySQL, Postgres, dll) cukup lewat chat untuk keperluan monitoring atau ETL ke depannya.
+- **Experimental Data Ingestion:** Pipeline awal untuk pemrosesan data (seperti file Excel/CSV) yang akan dikonversi menjadi data siap olah di database.
+- **Dockerized Environment:** Seluruh sistem siap dijalankan dalam container, memastikan kemudahan deployment di mana saja.
 
 ---
 
-## 📊 Database Schema Design (The Core)
+## 🛠️ Tech Stack yang Digunakan
 
-Salah satu keunggulan proyek ini adalah perancangan skema yang scalable menggunakan Prisma.
+- **Runtime:** [Node.js](https://nodejs.org/) - Engine utama untuk menangani webhook dan logika bot.
+- **ORM:** [Prisma](https://www.prisma.io/) - Mengelola skema database dengan *type-safety* yang tinggi.
+- **Database:** [MySQL](https://www.mysql.com/) - Penyimpanan relasional untuk user, task, dan log aktivitas.
+- **Infrastructure:** [Docker](https://www.docker.com/) - Isolasi environment agar sistem berjalan konsisten.
+- **AI Logic:** OpenAI GPT-5 Nano - Otak di balik ekstraksi entitas dan pemahaman bahasa natural.
+
+---
+
+## 📊 Desain Skema Database (The Core)
+
+Kami merancang database yang ter-normalisasi untuk mendukung skalabilitas fitur di masa depan.
 
 ```prisma
-// Core Schema Entities
-model User {
-    id        BigInt   @id @unique
-    username  String?
-    tasks     Task[]
-    chats     Chat[]
-    @@map("users")
-}
-
+// Contoh model inti di Prisma
 model Task {
     id          Int       @id @default(autoincrement())
-    taskType    String    @map("task_type") // task, bug, feature
+    taskType    String    @map("task_type") // project, enhance, bugfix, adhoc
     title       String
-    status      String    @default("todo")
+    status      String    @default("todo") // todo, doing, done
+    priority    String    @default("medium")
+    dueDate     DateTime? @map("due_date")
     userId      BigInt    @map("user_id")
-    users       User      @relation(fields: [userId], references: [id])
-    reminders   Reminder[]
-    @@map("tasks")
+    // ... relasi ke User & Project
 }
 ```
 
-**Key Engineering Highlights:**
-- **Normalization:** Memastikan data user, task, dan project terpisah dengan relasi yang tepat.
-- **Data Typing:** Penggunaan `BigInt` untuk ID Telegram guna memastikan kompatibilitas dengan rentang ID API Telegram.
-- **Indexing:** Optimasi query pada primary keys dan unique constraints untuk performa tinggi.
-
 ---
 
-## 🚀 Key Features
+## 🛠️ Instalasi & Setup
 
-- **Natural Language Task Extraction:** Kirim pesan seperti "Ingatkan saya meeting jam 2 siang" dan sistem akan mengekstrak informasi menjadi record database yang terstruktur.
-- **Contextual Retrieval:** Mencari tugas atau informasi berdasarkan konteks percakapan sebelumnya.
-- **Automated Reminders:** Sistem pengingat otomatis berdasarkan entri `Reminder` yang terhubung dengan `Task`.
-- **Dockerized Environment:** Seluruh stack (Bot + MySQL) dapat dijalankan hanya dengan satu perintah `docker-compose up`.
-
----
-
-## 🛠️ Installation & Setup
-
-1. **Clone & Install:**
+1. **Clone Repository:**
    ```bash
    git clone https://github.com/royandhika/telebot-assistant.git
+   cd telebot-assistant
    npm install
    ```
 
-2. **Environment Setup:**
-   Buat file `.env` di dalam folder `telebot` dan isi token Telegram serta URL database.
+2. **Konfigurasi Environment:**
+   Buat file `.env` di dalam folder `telebot` dan isi:
+   ```env
+   BOT_TOKEN=your_telegram_bot_token
+   DATABASE_URL="mysql://user:pass@localhost:3306/telebot_db"
+   OPENAI_API_KEY=your_api_key
+   ```
 
-3. **Database Migration:**
+3. **Migrasi Database:**
    ```bash
    npx prisma migrate dev
    ```
 
-4. **Run with Docker:**
+4. **Jalankan dengan Docker:**
    ```bash
    docker-compose up -d
    ```
 
 ---
 
-## 📈 Future Roadmap (Engineering Perspective)
-- [ ] **Vector Database Integration:** Menambahkan Pinecone/Milvus untuk *Long-term memory* menggunakan RAG (Retrieval-Augmented Generation).
-- [ ] **Message Queuing:** Implementasi Redis BullMQ untuk menangani lonjakan pesan (high availability).
-- [ ] **Advanced Analytics:** Pipeline data untuk menganalisis pola produktivitas user.
+## 📈 Roadmap Masa Depan
+- [ ] **Advanced Excel/CSV Ingestion:** Integrasi penuh dengan modul Python (`data-processor`) untuk pengolahan file besar.
+- [ ] **Vector Search (RAG):** Pencarian tugas menggunakan konteks semantik.
+- [ ] **Notification System:** Pengingat otomatis saat mendekati deadline tugas.
 
 ---
-Developed with ❤️ by Roy
+Developed with ❤️
