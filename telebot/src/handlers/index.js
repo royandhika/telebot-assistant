@@ -1,7 +1,7 @@
 import logger from '../logger/logger.js';
 import { handleTextMessage, createMessageObject } from './textHandler.js';
 import { handleCreateTask } from './tasks/createTaskHandler.js';
-import { handleRead } from './tasks/readTaskHandler.js';
+import { handleReadTask } from './tasks/readTaskHandler.js';
 import { handleUpdate } from './tasks/updateTaskHandler.js';
 
 function setupHandlers(bot) {
@@ -24,13 +24,19 @@ function setupHandlers(bot) {
   bot.command('view_task', async (ctx) => {
     logger.info(`User ${ctx.from.id} triggered /view_task`);
     const message = createMessageObject(ctx);
-    await handleRead(ctx, message);
+    await handleReadTask(ctx, message);
   });
 
   bot.command('edit_task', async (ctx) => {
     logger.info(`User ${ctx.from.id} triggered /edit_task`);
     const message = createMessageObject(ctx);
     await handleUpdate(ctx, message);
+  });
+
+  bot.command('consume_data', async (ctx) => {
+    logger.info(`User ${ctx.from.id} triggered /consume_data`);
+    const message = createMessageObject(ctx);
+    await handleDataLanding(ctx, message);
   });
 
   bot.on('text', handleTextMessage);

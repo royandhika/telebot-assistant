@@ -31,7 +31,7 @@ const transportErrorRotate = new winston.transports.DailyRotateFile({
 
 // New logger instance
 const logger = winston.createLogger({
-  level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
   format: combine(
     errors({ stack: true }),
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),

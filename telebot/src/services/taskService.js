@@ -30,4 +30,55 @@ async function createTask(userId, taskDetail) {
   }
 }
 
-export { createTask };
+async function readTasks(userId, filters) {
+  try {
+    const now = new Date();
+    const where = {
+      userId: userId,
+      // Default: exclude 'done' unless status is explicitly requested as 'done'
+      status: filters.status ? filters.status : { not: 'done' },
+      ...(filters.taskType && { taskType: filters.taskType }),
+      ...(filters.priority && { priority: filters.priority }),
+      ...(filters.projectName && {
+        projects: {
+          name: filters.projectName
+        }
+      }),
+      // Handle Date range
+      ...( (filters.startDate || filters.endDate) ? {
+        dueDate: {
+          ...(filters.startDate && { gte: new Date(filters.startDate) }),
+          ...(filters.endDate && { lte: new Date(filters.endDate) }),
+        }
+      } : {
+        // Default: exclude expired tasks (dueDate < now)
+        dueDate: {
+          gte: now
+        }
+      }),
+    };
+
+    if (filters.queryType === 'count') {
+      const count = await prisma.task.count({ where });
+      return { count };
+    }
+
+    const tasks = await prisma.task.findMany({
+      where,
+      include: {
+        projects: true
+      },
+      orderBy: {
+        dueDate: 'asc'
+      }
+    });
+
+    logger.info(`Read ${tasks.length} tasks for user ${userId} with filters: ${JSON.stringify(filters)}`);
+    return { tasks };
+  } catch (error) {
+    logger.error(`Failed to read tasks for user ${userId}:`, error);
+    throw error;
+  }
+}
+
+export { createTask, readTasks };

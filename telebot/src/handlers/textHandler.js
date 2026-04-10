@@ -1,7 +1,7 @@
 import { logChat } from '../services/chatService.js';
 import { parseIntent } from '../ai/parsers/intentParser.js';
 import { handleCreateTask } from './tasks/createTaskHandler.js';
-import { handleRead } from './tasks/readTaskHandler.js';
+import { handleReadTask } from './tasks/readTaskHandler.js';
 import { handleUpdate } from './tasks/updateTaskHandler.js';
 import { handleAddDatabase } from './databases/addDatabaseHandler.js';
 import logger from '../logger/logger.js';
@@ -36,7 +36,7 @@ export async function handleTextMessage(ctx) {
         await handleCreateTask(ctx, message);
         break;
       case 'READ':
-        await handleRead(ctx, message);
+        await handleReadTask(ctx, message);
         break;
       case 'UPDATE':
         await handleUpdate(ctx, message);

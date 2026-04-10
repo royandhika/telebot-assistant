@@ -1,5 +1,5 @@
 import { createTask } from '../../services/taskService.js';
-import { parseTask } from '../../ai/parsers/taskParser.js';
+import { parseTask } from '../../ai/tasks/createTaskParser.js';
 import { formatTaskDueDate, buildTaskReplyMessage } from '../../utils/formatter.js';
 import logger from '../../logger/logger.js';
 
