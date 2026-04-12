@@ -12,8 +12,9 @@ model User {
     createdAt  DateTime @default(now()) @map("created_at")
     modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
 
-    tasks Task[]
-    chats Chat[]
+    tasks     Task[]
+    chats     Chat[]
+    reminders Reminder[]
 
     @@map("users")
 }
@@ -74,4 +75,19 @@ model Database {
     modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
 
     @@map("databases")
+}
+
+model Reminder {
+    id         Int       @id @default(autoincrement())
+    userId     BigInt    @map("user_id")
+    message    String
+    status     String    @default("pending") // pending, sent, cancelled, completed
+    remindAt   DateTime? @map("remind_at")
+    isPriority Boolean   @default(false) @map("is_priority")
+    createdAt  DateTime  @default(now()) @map("created_at")
+    modifiedAt DateTime  @default(now()) @updatedAt @map("modified_at")
+
+    users User @relation(fields: [userId], references: [id])
+
+    @@map("reminders")
 }

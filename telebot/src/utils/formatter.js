@@ -1,35 +1,32 @@
 function formatTaskDueDate(dueDate) {
-    return new Intl.DateTimeFormat('id-ID', {
-        weekday: 'long',
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-        timeZone: 'Asia/Jakarta',
-    }).format(new Date(dueDate)) + ' WIB';
+  return new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Jakarta',
+  }).format(new Date(dueDate)) + ' WIB';
 }
 
 function buildTaskReplyMessage(newTask) {
-    return `
-<b>🪪 ID:</b> ${newTask.id}
-<b>🛠️ Project:</b> ${newTask.projectName}
-<b>📝 Task:</b> ${newTask.title}
-<b>📆 Deadline:</b> ${newTask.dueDate}
-`
+  let response = `<b>✅ Task berhasil dibuat!</b>\n\n`;
+  response += `<b>🪪 ID:</b> ${newTask.id}\n`;
+  response += `<b>🛠️ Project:</b> ${newTask.projectName}\n`;
+  response += `<b>📝 Task:</b> ${newTask.title}\n`;
+  response += `<b>📆 Deadline:</b> ${newTask.dueDate}\n`;
+  return response;
 }
 
 function buildDatabaseReplyMessage(newDb) {
-    return `
-<b>💾 Database udah ditambahkan</b>
-
-<b>Host:</b> ${newDb.host}:${newDb.port}
-<b>Database:</b> ${newDb.name}
-<b>Username:</b> ${newDb.username}
-
-Kamu bisa pakai database ini untuk pipeline barumu.
-`
+  let response = `<b>💾 Database udah ditambahkan</b>\n\n`;
+  response += `<b>Host:</b> ${newDb.host}:${newDb.port}\n`;
+  response += `<b>Database:</b> ${newDb.name}\n`;
+  response += `<b>Username:</b> ${newDb.username}\n\n`;
+  response += `Kamu bisa pakai database ini untuk pipeline barumu.`;
+  return response;
 }
 
 function buildTaskCountReply(count, readInfo) {
@@ -49,11 +46,30 @@ function buildTaskListReply(tasks) {
 
   let response = "<b>Daftar Task Kamu:</b>\n\n";
   tasks.forEach((task, index) => {
-    const projectName = task.projects?.name || 'No Project';
     const dueDate = task.dueDate ? formatTaskDueDate(task.dueDate) : 'No Deadline';
     
-    response += `${projectName}: <b>${task.title}</b>\n`;
+    response += `${task.projects.name}: <b>${task.title}</b>\n`;
     response += `📆 Deadline: ${dueDate}\n\n`;
+  });
+  return response;
+}
+
+function buildNewReminderReply(reminder) {
+  let response = `<b>✅ Reminder berhasil dibuat!</b>\n\n`;
+  response += `<b>Reminder:</b> ${reminder.message}\n`;
+  response += `<b>Waktu:</b> ${reminder.remindAt ? formatTaskDueDate(reminder.remindAt) : 'Tidak ada waktu'}\n`;
+  response += `<b>Prioritas:</b> ${reminder.isPriority ? 'Ya' : 'Tidak'}\n`;
+  return response;
+}
+
+function buildListReminderReply(reminder) {
+  let response = `<b>Daftar Reminder Kamu:</b>\n\n`;
+  reminder.forEach((reminder, index) => {
+    const remindAt = reminder.remindAt ? formatTaskDueDate(reminder.remindAt) : 'Tidak ada waktu';
+    
+    response += `<b>${index + 1}. ${reminder.message}</b>\n`;
+    response += `📆 Waktu: ${remindAt}\n`;
+    response += `⚠️ Prioritas: ${reminder.isPriority ? 'Ya' : 'Tidak'}\n\n`;
   });
   return response;
 }
@@ -63,5 +79,7 @@ export {
     buildTaskReplyMessage, 
     buildDatabaseReplyMessage, 
     buildTaskCountReply, 
-    buildTaskListReply 
+    buildTaskListReply,
+    buildNewReminderReply,
+    buildListReminderReply
 };

@@ -3,6 +3,8 @@ import { handleTextMessage, createMessageObject } from './textHandler.js';
 import { handleCreateTask } from './tasks/createTaskHandler.js';
 import { handleReadTask } from './tasks/readTaskHandler.js';
 import { handleUpdate } from './tasks/updateTaskHandler.js';
+import { handleAddReminder } from './reminder/addReminderHandler.js';
+import { handleGetReminder } from './reminder/getReminderHandler.js';
 
 function setupHandlers(bot) {
   bot.start((ctx) => {
@@ -13,6 +15,18 @@ function setupHandlers(bot) {
   bot.help((ctx) => {
     logger.info(`User ${ctx.from.id} requested help`);
     ctx.reply('Saat ini anda bisa mendaftarkan task atau database.');
+  });
+
+  bot.command('add', async (ctx) => {
+    logger.info(`User ${ctx.from.id} triggered /add`);
+    const message = createMessageObject(ctx);
+    await handleAddReminder(ctx, message);
+  });
+
+  bot.command('list', async (ctx) => {
+    logger.info(`User ${ctx.from.id} triggered /list`);
+    const message = createMessageObject(ctx);
+    await handleGetReminder(ctx, message);
   });
 
   bot.command('create_task', async (ctx) => {
