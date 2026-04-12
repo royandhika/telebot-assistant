@@ -3,6 +3,11 @@ import { parseGetReminder } from '../../ai/reminder/getReminderAi.js';
 import { buildListReminderReply } from '../../utils/formatter.js';
 import logger from '../../logger/logger.js';
 
+/**
+ * Handles the retrieval of reminders
+ * @param {import('telegraf').Context} ctx - Telegram context object
+ * @param {Object} message - The message object containing user input
+ */
 export async function handleGetReminder(ctx, message) {
   try {
     // AI parse to extract task details

@@ -1,5 +1,10 @@
 import { openai } from '../index.js';
 
+/**
+ * Parses the user's message to extract reminder filtering criteria
+ * @param {string} userMessage - The message from the user
+ * @returns {Promise<Object>} The parsed reminder filter criteria
+ */
 export async function parseGetReminder(userMessage) {
 	const today = new Date().toISOString();
 	const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
