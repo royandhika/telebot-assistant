@@ -1,7 +1,7 @@
 import logger from "../../logger/logger.js";
 import { parseRead } from "../../ai/tasks/readTaskParser.js";
 import { readTasks } from "../../services/taskService.js";
-import { buildTaskCountReply, buildTaskListReply } from "../../utils/formatter.js";
+import { formatTaskCountReply, formatTaskListReply } from "../../utils/formatter.js";
 
 export async function handleReadTask(ctx, message) {
   try {
@@ -14,9 +14,9 @@ export async function handleReadTask(ctx, message) {
 
     let response;
     if (readInfo.queryType === 'count') {
-      response = buildTaskCountReply(result.count, readInfo);
+      response = formatTaskCountReply(result.count, readInfo);
     } else {
-      response = buildTaskListReply(result.tasks);
+      response = formatTaskListReply(result.tasks);
     }
 
     await ctx.reply(response, { parse_mode: 'HTML' });

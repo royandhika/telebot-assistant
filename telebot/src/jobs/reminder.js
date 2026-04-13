@@ -1,5 +1,6 @@
 import cron from 'node-cron';
-import { prisma } from '../prisma.js';
+import { getPendingReminders, markReminderAsSent, markReminderAsCancelled } from '../services/reminderService.js';
+import { formatReminderMessage } from '../utils/formatter.js';
 import logger from '../logger/logger.js';
 import { Markup } from 'telegraf';
 
@@ -10,16 +11,7 @@ import { Markup } from 'telegraf';
 export const setupReminderJob = (bot) => {
   cron.schedule('* * * * *', async () => {
     try {
-      const now = new Date();
-      
-      const pendingReminders = await prisma.reminder.findMany({
-        where: {
-          status: 'pending',
-          remindAt: {
-            lte: now
-          }
-        }
-      });
+      const pendingReminders = await getPendingReminders();
 
       if (pendingReminders.length === 0) {
         return;
@@ -31,8 +23,9 @@ export const setupReminderJob = (bot) => {
       for (const reminder of pendingReminders) {
         try {
           const userId = reminder.userId.toString();
+          const messageText = formatReminderMessage(reminder.message);
           
-          await bot.telegram.sendMessage(userId, `🔔 *REMINDER*\n\n${reminder.message}`, {
+          await bot.telegram.sendMessage(userId, messageText, {
             parse_mode: 'Markdown',
             ...Markup.inlineKeyboard([
               Markup.button.callback('Selesai', `complete_${reminder.id}`),
@@ -41,29 +34,20 @@ export const setupReminderJob = (bot) => {
             ])
           });
 
-          await prisma.reminder.update({
-            where: { id: reminder.id },
-            data: { 
-              status: 'sent',
-              modifiedAt: new Date()
-            }
-          });
+          await markReminderAsSent(reminder.id);
 
           logger.info(`[Cron Job] Reminder ID ${reminder.id} sent successfully to user ${userId}`);
         } catch (err) {
           logger.error(`[Cron Job] Failed to send reminder ID ${reminder.id}: ${err.message}`);
           
-          // Optional
+          // If the bot is blocked by the user, cancel the reminder
           if (err.description?.includes('forbidden')) {
-            await prisma.reminder.update({
-              where: { id: reminder.id },
-              data: { status: 'cancelled' }
-            });
+            await markReminderAsCancelled(reminder.id);
           }
         }
       }
     } catch (error) {
-      logger.error('[Cron Job] Error fetching reminders:', error);
+      logger.error('[Cron Job] Error during execution:', error);
     }
   });
   

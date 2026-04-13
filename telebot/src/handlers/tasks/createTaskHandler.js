@@ -1,6 +1,6 @@
 import { createTask } from '../../services/taskService.js';
 import { parseTask } from '../../ai/tasks/createTaskParser.js';
-import { formatTaskDueDate, buildTaskReplyMessage } from '../../utils/formatter.js';
+import { formatTaskDueDate, formatTaskReplyMessage } from '../../utils/formatter.js';
 import logger from '../../logger/logger.js';
 
 export async function handleCreateTask(ctx, message) {
@@ -15,7 +15,7 @@ export async function handleCreateTask(ctx, message) {
     // Build reply message
     newTask.projectName = taskInfo.projectName;
     newTask.dueDate = formatTaskDueDate(newTask.dueDate);
-    const replyMessage = buildTaskReplyMessage(newTask);
+    const replyMessage = formatTaskReplyMessage(newTask);
     
     await ctx.reply(replyMessage, { parse_mode: 'HTML' });
   } catch (error) {

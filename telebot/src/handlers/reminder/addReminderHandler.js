@@ -1,6 +1,6 @@
 import { createReminder } from '../../services/reminderService.js';
 import { parseAddReminder } from '../../ai/reminder/addReminderAi.js';
-import { buildNewReminderReply } from '../../utils/formatter.js';
+import { formatNewReminderReply } from '../../utils/formatter.js';
 import logger from '../../logger/logger.js';
 
 /**
@@ -18,7 +18,7 @@ export async function handleAddReminder(ctx, message) {
     const newReminder = await createReminder(message.userId, reminderInfo);
     
     // Build reply message
-    const replyMessage = buildNewReminderReply(newReminder);
+    const replyMessage = formatNewReminderReply(newReminder);
     
     await ctx.reply(replyMessage, { parse_mode: 'HTML' });
   } catch (error) {

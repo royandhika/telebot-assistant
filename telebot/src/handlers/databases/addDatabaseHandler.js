@@ -1,6 +1,6 @@
 import { parseDatabaseInfo } from '../../ai/parsers/databaseParser.js';
 import { addDatabase } from '../../services/databaseService.js';
-import { buildDatabaseReplyMessage } from '../../utils/formatter.js';
+import { formatDatabaseReplyMessage } from '../../utils/formatter.js';
 import logger from '../../logger/logger.js';
 
 export async function handleAddDatabase(ctx, message) {
@@ -13,7 +13,7 @@ export async function handleAddDatabase(ctx, message) {
     const newDb = await addDatabase(dbInfo);
 
     // Build reply message
-    const successMsg = buildDatabaseReplyMessage(newDb);
+    const successMsg = formatDatabaseReplyMessage(newDb);
     await ctx.reply(successMsg, { parse_mode: 'HTML' });
 
   } catch (error) {

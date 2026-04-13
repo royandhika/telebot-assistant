@@ -91,8 +91,72 @@ async function updateReminderStatus(reminderId, action) {
   }
 }
 
+/**
+ * Fetches pending reminders that are due
+ * @returns {Promise<Array>} The list of pending reminders
+ */
+async function getPendingReminders() {
+  try {
+    const now = new Date();
+    return await prisma.reminder.findMany({
+      where: {
+        status: 'pending',
+        remindAt: {
+          lte: now
+        }
+      }
+    });
+  } catch (error) {
+    logger.error('Failed to fetch pending reminders:', error);
+    throw error;
+  }
+}
+
+/**
+ * Marks a reminder as sent
+ * @param {number} reminderId - The ID of the reminder
+ * @returns {Promise<Object>} The updated reminder object
+ */
+async function markReminderAsSent(reminderId) {
+  try {
+    return await prisma.reminder.update({
+      where: { id: reminderId },
+      data: { 
+        status: 'sent',
+        modifiedAt: new Date()
+      }
+    });
+  } catch (error) {
+    logger.error(`Failed to mark reminder ID ${reminderId} as sent:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Marks a reminder as cancelled
+ * @param {number} reminderId - The ID of the reminder
+ * @returns {Promise<Object>} The updated reminder object
+ */
+async function markReminderAsCancelled(reminderId) {
+  try {
+    return await prisma.reminder.update({
+      where: { id: reminderId },
+      data: { 
+        status: 'cancelled',
+        modifiedAt: new Date()
+      }
+    });
+  } catch (error) {
+    logger.error(`Failed to mark reminder ID ${reminderId} as cancelled:`, error);
+    throw error;
+  }
+}
+
 export { 
   createReminder, 
   getReminder,
-  updateReminderStatus
+  updateReminderStatus,
+  getPendingReminders,
+  markReminderAsSent,
+  markReminderAsCancelled
 };

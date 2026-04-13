@@ -1,4 +1,5 @@
 import { updateReminderStatus } from '../../services/reminderService.js';
+import { formatSnoozedReminder } from '../../utils/formatter.js';
 import logger from '../../logger/logger.js';
 
 /**
@@ -7,21 +8,23 @@ import logger from '../../logger/logger.js';
  * @param {string} action - 'snooze_30m' or 'snooze_1d'
  */
 export async function handleSnoozeReminder(ctx, action) {
+  let reminderId;
   try {
-    const reminderId = parseInt(ctx.match[1], 10);
+    reminderId = parseInt(ctx.match[2], 10);
     
     // Service to update reminder time
     await updateReminderStatus(reminderId, action);
 
+    // Get snooze human-readable text
+    const snoozeText = action === 'snooze_30m' ? '30 menit' : '1 hari';
+
+    // Build the updated message text using the formatter
+    const originalText = ctx.callbackQuery.message.text;
+    const updatedText = formatSnoozedReminder(originalText, snoozeText);
+
     // Give reply
-    let snoozeText = '';
-    if (action === 'snooze_30m') {
-      snoozeText = '30 menit';
-    } else if (action === 'snooze_1d') {
-      snoozeText = '1 hari';
-    }
     await ctx.answerCbQuery(`Oke, aku ingetin lagi ${snoozeText} lagi! 💤`);
-    await ctx.editMessageText(`💤 *Snoozed*\n\n${ctx.callbackQuery.message.text.replace('🔔 REMINDER\n\n', '')}\n\n_(Akan diingatkan kembali dalam ${snoozeText})_`, {
+    await ctx.editMessageText(updatedText, {
       parse_mode: 'Markdown'
     });
   } catch (error) {

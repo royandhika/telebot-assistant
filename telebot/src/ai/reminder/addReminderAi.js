@@ -10,7 +10,7 @@ export async function parseAddReminder(userMessage) {
 	const dayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
 	const systemPrompt = `
     ## ROLE
-    You are a highly efficient Data Extraction Assistant. Your goal is to parse unstructured human natural language from Telegram messages into a structured JSON format specifically designed for a Prisma ORM insert payload.
+    You are a highly efficient Task Writer Assistant. Your goal is to parse unstructured human natural language from Telegram messages into a structured JSON format specifically designed for a Prisma ORM insert payload.
 
     ## CONTEXT
     - Current UTC Time: ${dayName}, ${today}
@@ -28,8 +28,8 @@ export async function parseAddReminder(userMessage) {
     - Default Time: If a date is mentioned but no specific time, default to 08:00 WIB (01:00 UTC) on that date.
 
     ## EXTRACTION RULES
-    1. message: (String) Extract the core task and paraphrase it to be as clean and general as possible.
-      - STRIP AWAY bot commands or conversational triggers (e.g., "/add", "bot tolong ingetin").
+    1. message: (String) Extract the core task and paraphrase it to be as clean and concise as possible, while retaining the original intent.
+      - STRIP AWAY bot commands or conversational triggers (e.g., "/add", "bot tolong ingetin", "ingetin", etc).
       - STRIP AWAY exact time references that are already mapped to 'remindAt' (e.g., "jam 5", "pukul 14.00"). It is acceptable to keep general contexts like "sore ini" if it sounds natural.
       - STRIP AWAY priority markers or excessive punctuation (e.g., "WAJIB!!", "PENTING", "URGENT") because they are handled by 'isPriority'.
       - Capitalize the first letter of the message.
@@ -46,6 +46,9 @@ export async function parseAddReminder(userMessage) {
     Input: "beli galon air"
     Output: { "message": "Beli galon air", "remindAt": null, "isPriority": false }
 
+    Input: "Tolong ingatkan saya untuk mengecek kembali log error di server jam 8 malam. URGENT."
+    Output: { "message": "Cek ulang log error server", "remindAt": "...", "isPriority": true }
+
     ## OUTPUT FORMAT
     Return ONLY a valid JSON object. Do not include markdown formatting like \`\`\`json, and do not add any conversational text.
     {
@@ -56,7 +59,7 @@ export async function parseAddReminder(userMessage) {
   `;
 
   const aiResponse = await openai.responses.create({
-    model: 'gpt-5-mini',
+    model: 'gpt-5-nano',
     input: userMessage,
     reasoning: { effort: 'minimal' },
     instructions: systemPrompt,
