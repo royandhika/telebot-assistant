@@ -23,7 +23,7 @@ export const setupReminderJob = (bot) => {
       for (const reminder of pendingReminders) {
         try {
           const userId = reminder.userId.toString();
-          const messageText = formatReminderMessage(reminder.message);
+          const messageText = formatReminderMessage(reminder.message, reminder.isPriority);
           
           await bot.telegram.sendMessage(userId, messageText, {
             parse_mode: 'Markdown',

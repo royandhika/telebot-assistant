@@ -96,7 +96,8 @@ function formatTaskListReply(tasks) {
  * @returns {string} Formatted HTML message for Telegram
  */
 function formatNewReminderReply(reminder) {
-  let response = `📌 <b>Reminder berhasil dibuat!</b>\n`;
+  const header = reminder.isPriority ? '📌‼️' : '📌';
+  let response = `${header} <b>Reminder berhasil dibuat!</b>\n`;
   response += `${reminder.message}`;
   return response;
 }
@@ -108,14 +109,14 @@ function formatNewReminderReply(reminder) {
  */
 function formatListReminderReply(reminder) {
   if (reminder.length === 0) {
-    return "Belum ada reminder yang sesuai kriteria nih.";
+    return "Belum ada reminder, nih!";
   }
   let response = `<b>Daftar Reminder Kamu:</b>\n\n`;
   reminder.forEach((reminder, index) => {
     const remindAt = reminder.remindAt ? formatTaskDueDate(reminder.remindAt) : 'Tidak ada waktu';
     const remindAtHour = reminder.remindAt ? formatTaskHour(reminder.remindAt) : 'Tidak ada waktu';
     
-    response += `<b>${index + 1}.</b> ${reminder.message} ${reminder.isPriority ? '⚠️' : ''}\n`;
+    response += `<b>${index + 1}.</b> ${reminder.message} ${reminder.isPriority ? '‼️' : ''}\n`;
     response += `${remindAt} ${remindAtHour}\n\n`;
   });
   return response;
@@ -124,10 +125,12 @@ function formatListReminderReply(reminder) {
 /**
  * Formats the initial reminder notification message
  * @param {string} message - The reminder message content
+ * @param {boolean} isPriority - Whether the reminder is a priority
  * @returns {string} Formatted Markdown message
  */
-function formatReminderMessage(message) {
-  return `🔔 *REMINDER*\n\n${message}`;
+function formatReminderMessage(message, isPriority = false) {
+  const header = isPriority ? '🚨‼️' : '🔔';
+  return `${header} Reminder\n\n${message}`;
 }
 
 /**
@@ -137,7 +140,7 @@ function formatReminderMessage(message) {
  */
 function formatCompletedReminder(message) {
   // Clean the header if it exists
-  const cleanMessage = message.replace(/^🔔 REMINDER\n\n/, '');
+  const cleanMessage = message.replace(/^(🔔 \*REMINDER\*|🚨 \*REMINDER PRIORITAS\*|🔔 REMINDER|🚨 REMINDER PRIORITAS)\n\n/i, '');
   return `✅ *Task beres*\n${cleanMessage}`;
 }
 
@@ -149,7 +152,7 @@ function formatCompletedReminder(message) {
  */
 function formatSnoozedReminder(message, snoozeText) {
   // Clean the header if it exists
-  const cleanMessage = message.replace(/^🔔 REMINDER\n\n/, '');
+  const cleanMessage = message.replace(/^(🔔 \*REMINDER\*|🚨 \*REMINDER PRIORITAS\*|🔔 REMINDER|🚨 REMINDER PRIORITAS)\n\n/i, '');
   return `💤 *Snoozed*\n${cleanMessage}\n\n_(Akan diingatkan kembali dalam ${snoozeText})_`;
 }
 

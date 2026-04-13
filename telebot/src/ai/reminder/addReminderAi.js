@@ -33,33 +33,34 @@ export async function parseAddReminder(userMessage) {
       - STRIP AWAY exact time references that are already mapped to 'remindAt' (e.g., "jam 5", "pukul 14.00"). It is acceptable to keep general contexts like "sore ini" if it sounds natural.
       - STRIP AWAY priority markers or excessive punctuation (e.g., "WAJIB!!", "PENTING", "URGENT") because they are handled by 'isPriority'.
       - Capitalize the first letter of the message.
-    2. remindAt: (String | null) The calculated target date-time in ISO 8601 UTC. If no time/date context is found in the message, set to null.
+      - IF 'isPriority' is true, the entire 'message' MUST be in ALL CAPS (uppercase).
+    2. remindAt: (String) The calculated target date-time in ISO 8601 UTC. If no time/date context is found in the message, set to tomorrow's date at the default time.
     3. isPriority: (Boolean) Set to true ONLY if the user includes urgent keywords (e.g., "penting", "urgent", "asap", "cepetan", "prioritas") or uses strong emphasis (e.g., "!!!"). Otherwise, default to false.
 
     ## EXAMPLES
     Input: "Ke gereja sore ini jam 5. WAJIB!!"
-    Output: { "message": "Ke gereja sore ini", "remindAt": "2024-05-20T10:00:00.000Z", "isPriority": true }
+    Output: { "message": "KE GEREJA SORE", "remindAt": "2024-05-20T10:00:00.000Z", "isPriority": true }
 
     Input: "bot tolong ingetin aku meeting bulanan besok jam 9 pagi PENTING BANGET"
-    Output: { "message": "Meeting bulanan", "remindAt": "2024-05-21T02:00:00.000Z", "isPriority": true }
+    Output: { "message": "MEETING BULANAN", "remindAt": "2024-05-21T02:00:00.000Z", "isPriority": true }
 
     Input: "beli galon air"
-    Output: { "message": "Beli galon air", "remindAt": null, "isPriority": false }
+    Output: { "message": "Beli galon air", "remindAt": "2024-05-21T01:00:00.000Z", "isPriority": false }
 
     Input: "Tolong ingatkan saya untuk mengecek kembali log error di server jam 8 malam. URGENT."
-    Output: { "message": "Cek ulang log error server", "remindAt": "...", "isPriority": true }
+    Output: { "message": "CEK ULANG LOG ERROR SERVER", "remindAt": "2024-05-21T01:00:00.000Z", "isPriority": true }
 
     ## OUTPUT FORMAT
     Return ONLY a valid JSON object. Do not include markdown formatting like \`\`\`json, and do not add any conversational text.
     {
       "message": string,
-      "remindAt": string | null,
+      "remindAt": string,
       "isPriority": boolean
     }
   `;
 
   const aiResponse = await openai.responses.create({
-    model: 'gpt-5-nano',
+    model: 'gpt-5-mini',
     input: userMessage,
     reasoning: { effort: 'minimal' },
     instructions: systemPrompt,
