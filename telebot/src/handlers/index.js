@@ -7,15 +7,17 @@ import { handleAddReminder } from './reminder/addReminderHandler.js';
 import { handleGetReminder } from './reminder/getReminderHandler.js';
 import { handleCompleteReminder } from './reminder/completeActionHandler.js';
 import { handleSnoozeReminder } from './reminder/snoozeActionHandler.js';
+import { handleStart } from './startHandler.js';
 
 /**
  * Routing every input from user to the right handler
  * @param {import('telegraf').Telegraf} bot 
  */
 function setupHandlers(bot) {
-  bot.start((ctx) => {
-    logger.info(`User ${ctx.from.id} (${ctx.from.username}) started the bot.`);
-    ctx.reply('Welcome to ETL Assistant Bot!')
+  bot.start(async (ctx) => {
+    logger.info(`User ${ctx.from.id} triggered /start`);
+    const message = createMessageObject(ctx);
+    await handleStart(ctx, message);
   });
 
   bot.help((ctx) => {

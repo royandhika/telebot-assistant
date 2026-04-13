@@ -1,0 +1,21 @@
+import logger from '../logger/logger.js';
+import { upsertUser } from '../services/userService.js';
+
+/**
+ * Handle /start command
+ * @param {import('telegraf').Context} ctx - Telegram context object
+ * @param {Object} message - The message object
+ */
+export async function handleStart(ctx, message) {
+  const { id, username } = ctx.from;
+  
+  try {
+    // Call userService to upsert user data
+    await upsertUser(id, username);
+    
+    await ctx.reply('Welcome to ETL Assistant Bot! 🚀\n\nSaya akan membantu anda mengelola task, database, dan pengingat.');
+  } catch (error) {
+    logger.error(`Error in handleStart for user ${id}:`, error);
+    await ctx.reply('Welcome! Ada sedikit kendala saat mendaftarkan akunmu, tapi kamu tetap bisa mencoba menggunakan bot ini.');
+  }
+}
