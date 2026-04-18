@@ -140,7 +140,7 @@ function formatReminderMessage(message, isPriority = false) {
  */
 function formatCompletedReminder(message) {
   // Clean the header if it exists
-  const cleanMessage = message.replace(/^(🔔 \*REMINDER\*|🚨 \*REMINDER PRIORITAS\*|🔔 REMINDER|🚨 REMINDER PRIORITAS)\n\n/i, '');
+  const cleanMessage = message.replace(/^(🔔 \*Reminder\*|🚨‼️ \*Reminder\*|🔔 Reminder|🚨‼️ Reminder)\n\n/i, '');
   return `✅ *Task beres*\n${cleanMessage}`;
 }
 
@@ -152,8 +152,14 @@ function formatCompletedReminder(message) {
  */
 function formatSnoozedReminder(message, snoozeText) {
   // Clean the header if it exists
-  const cleanMessage = message.replace(/^(🔔 \*REMINDER\*|🚨 \*REMINDER PRIORITAS\*|🔔 REMINDER|🚨 REMINDER PRIORITAS)\n\n/i, '');
+  const cleanMessage = message.replace(/^(🔔 \*Reminder\*|🚨‼️ \*Reminder\*|🔔 Reminder|🚨‼️ Reminder)\n\n/i, '');
   return `💤 *Snoozed*\n${cleanMessage}\n\n_(Akan diingatkan kembali dalam ${snoozeText})_`;
+}
+
+function formatUploadDocument(logDocument) {
+  let response = `✅ Berhasil mengolah file <b>${logDocument.fileName}</b>\n`;
+  response += `Data diinsert ke table <b>${logDocument.tableName}</b> dan file diarsipkan di MinIO <b>${logDocument.s3Path}</b>`;
+  return response;
 }
 
 export { 
@@ -166,5 +172,6 @@ export {
     formatListReminderReply,
     formatReminderMessage,
     formatCompletedReminder,
-    formatSnoozedReminder
+    formatSnoozedReminder,
+    formatUploadDocument,
 };

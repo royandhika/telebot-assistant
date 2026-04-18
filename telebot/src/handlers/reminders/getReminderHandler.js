@@ -1,5 +1,5 @@
 import { getReminder } from '../../services/reminderService.js';
-import { parseGetReminder } from '../../ai/reminder/getReminderAi.js';
+import { parseGetReminder } from '../../ai/reminders/getReminderAi.js';
 import { formatListReminderReply } from '../../utils/formatter.js';
 import logger from '../../logger/logger.js';
 

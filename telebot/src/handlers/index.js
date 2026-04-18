@@ -3,11 +3,13 @@ import { handleTextMessage, createMessageObject } from './textHandler.js';
 import { handleCreateTask } from './tasks/createTaskHandler.js';
 import { handleReadTask } from './tasks/readTaskHandler.js';
 import { handleUpdate } from './tasks/updateTaskHandler.js';
-import { handleAddReminder } from './reminder/addReminderHandler.js';
-import { handleGetReminder } from './reminder/getReminderHandler.js';
-import { handleCompleteReminder } from './reminder/completeActionHandler.js';
-import { handleSnoozeReminder } from './reminder/snoozeActionHandler.js';
+import { handleAddReminder } from './reminders/addReminderHandler.js';
+import { handleGetReminder } from './reminders/getReminderHandler.js';
+import { handleCompleteReminder } from './reminders/completeActionHandler.js';
+import { handleSnoozeReminder } from './reminders/snoozeActionHandler.js';
 import { handleStart } from './startHandler.js';
+import { handleTestFastApi } from './testFastApiHandler.js';
+import { handleUploadDocument } from './documents/uploadDocumentHandler.js';
 
 /**
  * Routing every input from user to the right handler
@@ -24,6 +26,8 @@ function setupHandlers(bot) {
     logger.info(`User ${ctx.from.id} requested help`);
     ctx.reply('Saat ini anda bisa mendaftarkan task atau database.');
   });
+
+  bot.command('test', handleTestFastApi);
 
   bot.command('add', async (ctx) => {
     logger.info(`User ${ctx.from.id} triggered /add`);
@@ -51,6 +55,12 @@ function setupHandlers(bot) {
   });
 
   bot.on('text', handleTextMessage);
+
+  bot.on('document', async (ctx) => {
+    logger.info(`User ${ctx.from.id} sent a document`);
+    const message = createMessageObject(ctx);
+    await handleUploadDocument(ctx, message);
+  });
 }
 
 export { setupHandlers };
