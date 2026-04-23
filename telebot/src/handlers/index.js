@@ -1,15 +1,17 @@
 import logger from '../logger/logger.js';
 import { handleTextMessage, createMessageObject } from './textHandler.js';
-import { handleCreateTask } from './tasks/createTaskHandler.js';
-import { handleReadTask } from './tasks/readTaskHandler.js';
-import { handleUpdate } from './tasks/updateTaskHandler.js';
-import { handleAddReminder } from './reminders/addReminderHandler.js';
-import { handleGetReminder } from './reminders/getReminderHandler.js';
-import { handleCompleteReminder } from './reminders/completeActionHandler.js';
-import { handleSnoozeReminder } from './reminders/snoozeActionHandler.js';
 import { handleStart } from './startHandler.js';
 import { handleTestFastApi } from './testFastApiHandler.js';
-import { handleUploadDocument } from './documents/uploadDocumentHandler.js';
+import { 
+  handleAddReminder, 
+  handleGetReminder, 
+  handleCompleteReminder, 
+  handleSnoozeReminder 
+} from './reminderHandler.js';
+import { 
+  handleUploadDocument, 
+  handleReadTable 
+} from './dataWarehouseHandler.js';
 
 /**
  * Routing every input from user to the right handler
@@ -28,6 +30,8 @@ function setupHandlers(bot) {
   });
 
   bot.command('test', handleTestFastApi);
+
+  bot.command('read', handleReadTable);
 
   bot.command('add', async (ctx) => {
     logger.info(`User ${ctx.from.id} triggered /add`);

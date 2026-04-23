@@ -19,11 +19,28 @@ model User {
     createdAt  DateTime @default(now()) @map("created_at")
     modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
 
-    tasks     Task[]
-    chats     Chat[]
-    reminders Reminder[]
+    tasks        Task[]
+    chats        Chat[]
+    reminders    Reminder[]
+    documentLogs DocumentLog[]
 
     @@map("users")
+}
+
+model DocumentLog {
+    id         Int      @id @default(autoincrement())
+    userId     BigInt   @map("user_id")
+    fileName   String   @map("file_name")
+    fileId     String?  @map("file_id")
+    mimeType   String?  @map("mime_type")
+    s3Path     String?  @map("s3_path")
+    tableName  String?  @map("table_name")
+    fastApiRes String?  @map("fastapi_res") @db.Text
+    createdAt  DateTime @default(now()) @map("created_at")
+
+    users User @relation(fields: [userId], references: [id])
+
+    @@map("document_logs")
 }
 
 model Project {

@@ -1,9 +1,9 @@
 import { logChat } from '../services/chatService.js';
 import { parseIntent } from '../ai/parsers/intentParser.js';
-import { handleCreateTask } from './tasks/createTaskHandler.js';
-import { handleReadTask } from './tasks/readTaskHandler.js';
-import { handleUpdate } from './tasks/updateTaskHandler.js';
-import { handleAddDatabase } from './databases/addDatabaseHandler.js';
+// import { handleCreateTask } from './tasks/createTaskHandler.js';
+// import { handleReadTask } from './tasks/readTaskHandler.js';
+// import { handleUpdate } from './tasks/updateTaskHandler.js';
+// import { handleAddDatabase } from './databases/addDatabaseHandler.js';
 import logger from '../logger/logger.js';
 
 export function createMessageObject(ctx) {
