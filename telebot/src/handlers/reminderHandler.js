@@ -12,9 +12,9 @@ import logger from '../logger/logger.js';
 /**
  * Handles the addition of a new reminder
  * @param {import('telegraf').Context} ctx - Telegram context object
- * @param {Object} message - The message object containing user input
  */
-export async function handleAddReminder(ctx, message) {
+export async function handleAddReminder(ctx) {
+  const message = ctx.state.parsedMessage;
   try {
     // AI parse to extract task details
     const reminderInfo = await parseAddReminder(message.messageText);
@@ -28,7 +28,7 @@ export async function handleAddReminder(ctx, message) {
     
     await ctx.reply(replyMessage, { parse_mode: 'HTML' });
   } catch (error) {
-    logger.error(`Error in handleAddReminder for user ${message.userId}:`, error);
+    logger.error(`Error in handleAddReminder for user ${message?.userId}:`, error);
     await ctx.reply("Maaf, gagal membuat reminder. Coba ulangi detail reminder-nya dengan jelas.");
   }
 }
@@ -36,9 +36,9 @@ export async function handleAddReminder(ctx, message) {
 /**
  * Handles the retrieval of reminders
  * @param {import('telegraf').Context} ctx - Telegram context object
- * @param {Object} message - The message object containing user input
  */
-export async function handleGetReminder(ctx, message) {
+export async function handleGetReminder(ctx) {
+  const message = ctx.state.parsedMessage;
   try {
     // AI parse to extract task details
     const reminderFilter = await parseGetReminder(message.messageText);
@@ -52,7 +52,7 @@ export async function handleGetReminder(ctx, message) {
     
     await ctx.reply(replyMessage, { parse_mode: 'HTML' });
   } catch (error) {
-    logger.error(`Error in handleGetReminder for user ${message.userId}:`, error);
+    logger.error(`Error in handleGetReminder for user ${message?.userId}:`, error);
     await ctx.reply("Maaf, gagal mengambil daftar reminder.");
   }
 }

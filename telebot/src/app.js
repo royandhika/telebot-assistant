@@ -3,11 +3,15 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { setupHandlers } from './handlers/index.js';
 import { setupReminderJob } from './jobs/reminder.js';
+import { chatLoggerMiddleware } from './middlewares/chatLogger.js';
 
 dotenv.config()
 
 const app = express();
 const bot = new Telegraf(process.env.BOT_TOKEN);
+
+// Middleware
+bot.use(chatLoggerMiddleware);
 
 // Setup Cron Jobs
 setupReminderJob(bot);
@@ -18,7 +22,7 @@ const webhookPath = '/telegraf-webhook';
 // Set webhook link
 bot.telegram.setWebhook(`${publicUrl}${webhookPath}`);
 
-// Use telegraf as a middleware
+// Use telegraf
 app.use(bot.webhookCallback(webhookPath));
 
 // Setup Bot Handlers

@@ -7,9 +7,9 @@ import { formatUploadDocument } from '../utils/formatter.js';
 /**
  * Handles the upload of a document to ClickHouse via FastAPI
  * @param {import('telegraf').Context} ctx - Telegram context object
- * @param {Object} message - The message object containing user input
  */
-export async function handleUploadDocument(ctx, message) {
+export async function handleUploadDocument(ctx) {
+  const message = ctx.state.parsedMessage;
   try {
     ctx.sendChatAction('typing');
     // Extract document information from the context
@@ -61,7 +61,7 @@ export async function handleUploadDocument(ctx, message) {
     const replyMessage = formatUploadDocument(newLogDocument);
     await ctx.reply(replyMessage, { parse_mode: 'HTML' });
   } catch (error) {
-    logger.error(`Error in handleUploadDocument for user ${message.userId}`);
+    logger.error(`Error in handleUploadDocument for user ${message?.userId}`);
     const errorMessage = error.response?.data?.detail || error.message;
     await ctx.reply(`Maaf, gagal mengolah dokumen: ${errorMessage}`);
   }

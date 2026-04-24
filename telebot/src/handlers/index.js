@@ -1,7 +1,5 @@
 import logger from '../logger/logger.js';
-import { handleTextMessage, createMessageObject } from './textHandler.js';
 import { handleStart } from './startHandler.js';
-import { handleTestFastApi } from './testFastApiHandler.js';
 import { 
   handleAddReminder, 
   handleGetReminder, 
@@ -20,8 +18,7 @@ import {
 function setupHandlers(bot) {
   bot.start(async (ctx) => {
     logger.info(`User ${ctx.from.id} triggered /start`);
-    const message = createMessageObject(ctx);
-    await handleStart(ctx, message);
+    await handleStart(ctx);
   });
 
   bot.help((ctx) => {
@@ -29,20 +26,16 @@ function setupHandlers(bot) {
     ctx.reply('Saat ini anda bisa mendaftarkan task atau database.');
   });
 
-  bot.command('test', handleTestFastApi);
-
   bot.command('read', handleReadTable);
 
   bot.command('add', async (ctx) => {
     logger.info(`User ${ctx.from.id} triggered /add`);
-    const message = createMessageObject(ctx);
-    await handleAddReminder(ctx, message);
+    await handleAddReminder(ctx);
   });
 
   bot.command('list', async (ctx) => {
     logger.info(`User ${ctx.from.id} triggered /list`);
-    const message = createMessageObject(ctx);
-    await handleGetReminder(ctx, message);
+    await handleGetReminder(ctx);
   });
 
   bot.action(/complete_(\d+)/, async (ctx) => {
@@ -58,12 +51,9 @@ function setupHandlers(bot) {
     await handleSnoozeReminder(ctx, action);
   });
 
-  bot.on('text', handleTextMessage);
-
   bot.on('document', async (ctx) => {
     logger.info(`User ${ctx.from.id} sent a document`);
-    const message = createMessageObject(ctx);
-    await handleUploadDocument(ctx, message);
+    await handleUploadDocument(ctx);
   });
 }
 
