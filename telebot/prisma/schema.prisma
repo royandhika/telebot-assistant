@@ -20,7 +20,7 @@ model User {
     modifiedAt DateTime @default(now()) @updatedAt @map("modified_at")
 
     tasks        Task[]
-    chats        Chat[]
+    chatLogs     ChatLog[]
     reminders    Reminder[]
     documentLogs DocumentLog[]
 
@@ -74,7 +74,7 @@ model Task {
     @@map("tasks")
 }
 
-model Chat {
+model ChatLog {
     id        BigInt
     userId    BigInt   @map("user_id")
     body      String?
@@ -84,7 +84,7 @@ model Chat {
     users User @relation(fields: [userId], references: [id])
 
     @@id([id, userId])
-    @@map("chats")
+    @@map("chat_logs")
 }
 
 model Database {
