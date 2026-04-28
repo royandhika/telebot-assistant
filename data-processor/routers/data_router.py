@@ -22,12 +22,12 @@ async def upload(table_name: str = Form(...), file: UploadFile = File(...)):
 async def read(table_name: str, limit: int = 10):
     try:
         logger.info(f"🔍 Reading data from table: {table_name} with limit: {limit}")
-        df = get_table_data(table_name, limit)
+        df, total_rows = get_table_data(table_name, limit)
         
-        if df.empty:
+        if df.is_empty():
             raise HTTPException(status_code=404, detail=f"Table `{table_name}` is empty or does not exist.")
 
-        buf = generate_table_image(df)
+        buf = generate_table_image(df, total_rows, table_name)
         return StreamingResponse(buf, media_type="image/png")
     except HTTPException as he:
         raise he
