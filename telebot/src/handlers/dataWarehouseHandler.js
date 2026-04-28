@@ -52,7 +52,7 @@ export async function handleUploadDocument(ctx) {
       fileId: fileId,
       mimeType: document.mime_type,
       s3Path: uploadResponse.data.s3_path,
-      tableName: tableName,
+      tableName: uploadResponse.data.table_name,
       fastApiRes: uploadResponse.data,
     }
     const newLogDocument = await createDocumentLog(newDocument);
